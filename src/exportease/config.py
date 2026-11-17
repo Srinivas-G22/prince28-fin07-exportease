@@ -1,11 +1,13 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     app_name: str = "exportease"
-    app_env: str = "local"
+    app_env: Literal["local", "ci", "production"]
     log_level: str = "INFO"
     data_file: Path = Path("data/sample_records.json")
 

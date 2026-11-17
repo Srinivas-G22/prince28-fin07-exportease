@@ -1,64 +1,57 @@
-{
-  "documents": [
-    {
-      "id": "ftp-2023-ch4",
-      "doc_type": "FTP_2023",
-      "notice_number": "FTP 2023 (Updated)",
-      "issue_date": "2023-04-01",
-      "effective_date": "2023-04-01",
-      "title": "Foreign Trade Policy 2023 - Chapter 4: Duty Exemption & Remission Schemes",
-      "section": "Para 4.03 (Advance Authorisation) & Para 4.54 (RoDTEP)",
-      "source_url": "https://www.dgft.gov.in/",
-      "is_active": true,
-      "summary": "Governs duty-free import of inputs physically incorporated in export products under Advance Authorisation and remission of embedded duties under RoDTEP."
-    },
-    {
-      "id": "notif-32-2024-25",
-      "doc_type": "NOTIFICATION",
-      "notice_number": "Notification No. 32/2024-25",
-      "issue_date": "2024-09-30",
-      "effective_date": "2024-10-01",
-      "title": "Extension and Revision of RoDTEP Rates under Appendix 4R",
-      "section": "Appendix 4R - Chapter 61 (Knitted Apparel)",
-      "source_url": "https://www.dgft.gov.in/",
-      "is_active": true,
-      "summary": "Revises RoDTEP rates and per-unit value caps for tariff items under ITC(HS) Chapter 61, including cotton knitted T-shirts (HS 6109)."
-    }
-  ],
-  "rodtep_rates": [
-    {
-      "hs_code": "61091000",
-      "description": "T-shirts, singlets and other vests, knitted or crocheted, of cotton",
-      "export_policy": "FREE",
-      "rodtep_rate_pct": 1.6,
-      "cap_per_unit_inr": 6.4,
-      "uqc": "PCS",
-      "active_notification": "Notification No. 32/2024-25",
-      "effective_from": "2024-10-01",
-      "recent_amendments": [
-        {
-          "notice_number": "Notification No. 32/2024-25",
-          "effective_date": "2024-10-01",
-          "summary": "Updated Appendix 4R RoDTEP schedule rate and per-piece cap for cotton knitted T-shirts."
-        }
-      ]
-    },
-    {
-      "hs_code": "61102000",
-      "description": "Jerseys, pullovers, cardigans, waistcoats and similar articles, knitted or crocheted, of cotton",
-      "export_policy": "FREE",
-      "rodtep_rate_pct": 1.6,
-      "cap_per_unit_inr": 11.2,
-      "uqc": "PCS",
-      "active_notification": "Notification No. 32/2024-25",
-      "effective_from": "2024-10-01",
-      "recent_amendments": [
-        {
-          "notice_number": "Notification No. 32/2024-25",
-          "effective_date": "2024-10-01",
-          "summary": "Revised Appendix 4R RoDTEP rate and value cap for cotton knitted pullovers/hoodies."
-        }
-      ]
-    }
-  ]
-}
+[
+  {
+    "id": "001",
+    "doc_type": "Notification",
+    "number": "Notification No. 32/2024-25",
+    "date": "2024-09-30",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Extension of RoDTEP scheme for exports made from DTA Units and AA/EOU/SEZ Units"
+  },
+  {
+    "id": "002",
+    "doc_type": "Notification",
+    "number": "Notification No. 39/2024-25",
+    "date": "2024-10-28",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Alignment of RoDTEP Schedule consequent to changes in the First Schedule of Customs Tariff Act w.e.f. 01.10.2024"
+  },
+  {
+    "id": "003",
+    "doc_type": "Notification",
+    "number": "Notification No. 74/2023",
+    "date": "2024-03-11",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "RoDTEP implementation for exports of products manufactured by AA holders (except Deemed Exports) and EOU for 166 Tariff lines"
+  },
+  {
+    "id": "004",
+    "doc_type": "Notification",
+    "number": "Notification No. 70/2023",
+    "date": "2024-03-08",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Extending RoDTEP support for exports made by Advance Authorisation (AA) holders, Export Oriented Units (EOU), Special Economic Zones (SEZ) units"
+  },
+  {
+    "id": "005",
+    "doc_type": "Notification",
+    "number": "Notification No. 60/2023",
+    "date": "2024-02-13",
+    "chapter": "01-39",
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Notification of Indian Trade Classification (Harmonised System) of Export Items, 2023, Chapters 01-39 of Schedule 2, Export Policy of ITC (HS), 2023"
+  }
+]
