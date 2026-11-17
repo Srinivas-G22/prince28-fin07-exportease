@@ -10,7 +10,7 @@ Owner of a knitwear export unit in Tiruppur shipping to the EU who wants to clai
 
 ## The problem
 
-The Foreign Trade Policy 2023 and Handbook of Procedures are amended by many notifications and public notices, and incentive rates sit in large tables by HS code.
+Navigating India's export regulations requires deciphering the Foreign Trade Policy 2023 and its Handbook of Procedures, which are constantly updated across hundreds of scattered notifications and public notices. Exporters must also manually cross-reference complex, multi-page incentive tables structured by HS code to determine correct duty remission rates. As a result, finding active rules and matching them accurately to specific shipment scenarios is error-prone, time-consuming, and risky for small business owners.
 
 ## Data sources
 
@@ -35,15 +35,5 @@ Correct HS-code lookups for 95%+ of 40 tests; latest-amendment correctness 90%+.
 
 ```bash
 uv sync
-cp .env.example .env   # Windows: copy .env.example .env
+cp .env.example .env    # Windows: copy .env.example .env
 uv run uvicorn exportease.api.main:create_app --factory --reload
-```
-
-Then open http://localhost:8000/docs
-
-## Checks
-
-```bash
-uv run pytest
-uv run ruff check .
-```
