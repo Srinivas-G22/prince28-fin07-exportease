@@ -1,0 +1,57 @@
+[
+  {
+    "id": "001",
+    "doc_type": "Notification",
+    "number": "Notification No. 32/2024-25",
+    "date": "2024-09-30",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Extension of RoDTEP scheme for exports made from DTA Units and AA/EOU/SEZ Units"
+  },
+  {
+    "id": "002",
+    "doc_type": "Notification",
+    "number": "Notification No. 39/2024-25",
+    "date": "2024-10-28",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Alignment of RoDTEP Schedule consequent to changes in the First Schedule of Customs Tariff Act w.e.f. 01.10.2024"
+  },
+  {
+    "id": "003",
+    "doc_type": "Notification",
+    "number": "Notification No. 74/2023",
+    "date": "2024-03-11",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "RoDTEP implementation for exports of products manufactured by AA holders (except Deemed Exports) and EOU for 166 Tariff lines"
+  },
+  {
+    "id": "004",
+    "doc_type": "Notification",
+    "number": "Notification No. 70/2023",
+    "date": "2024-03-08",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Extending RoDTEP support for exports made by Advance Authorisation (AA) holders, Export Oriented Units (EOU), Special Economic Zones (SEZ) units"
+  },
+  {
+    "id": "005",
+    "doc_type": "Notification",
+    "number": "Notification No. 60/2023",
+    "date": "2024-02-13",
+    "chapter": "01-39",
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Notification of Indian Trade Classification (Harmonised System) of Export Items, 2023, Chapters 01-39 of Schedule 2, Export Policy of ITC (HS), 2023"
+  }
+]
