@@ -8,7 +8,8 @@
     "hs_code": null,
     "rate": null,
     "cap": null,
-    "subject": "Extension of RoDTEP scheme for exports made from DTA Units and AA/EOU/SEZ Units"
+    "subject": "Extension of RoDTEP scheme for exports made from DTA Units and AA/EOU/SEZ Units",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/8a5fe49d-609d-47ee-9357-2f27b0900fcf/Notification 32 Eng.pdf"
   },
   {
     "id": "002",
@@ -19,7 +20,8 @@
     "hs_code": null,
     "rate": null,
     "cap": null,
-    "subject": "Alignment of RoDTEP Schedule consequent to changes in the First Schedule of Customs Tariff Act w.e.f. 01.10.2024"
+    "subject": "Alignment of RoDTEP Schedule consequent to changes in the First Schedule of Customs Tariff Act w.e.f. 01.10.2024",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/81b20049-2c78-4520-b479-f31954e04a73/Notification No. 39 (English).pdf"
   },
   {
     "id": "003",
@@ -30,7 +32,8 @@
     "hs_code": null,
     "rate": null,
     "cap": null,
-    "subject": "RoDTEP implementation for exports of products manufactured by AA holders (except Deemed Exports) and EOU for 166 Tariff lines"
+    "subject": "RoDTEP implementation for exports of products manufactured by AA holders (except Deemed Exports) and EOU for 166 Tariff lines",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/9e50b696-4851-4bbc-b7ba-d4b17622e62c/Notification 74 dated 11.03.2024-English.pdf"
   },
   {
     "id": "004",
@@ -41,17 +44,199 @@
     "hs_code": null,
     "rate": null,
     "cap": null,
-    "subject": "Extending RoDTEP support for exports made by Advance Authorisation (AA) holders, Export Oriented Units (EOU), Special Economic Zones (SEZ) units"
+    "subject": "Extending RoDTEP support for exports made by Advance Authorisation (AA) holders, Export Oriented Units (EOU), Special Economic Zones (SEZ) units",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/b44a72ff-5ccf-4c0b-ad24-a65f5266c926/Notification No.70 dated 08.03.2024 English.pdf"
   },
   {
     "id": "005",
     "doc_type": "Notification",
     "number": "Notification No. 60/2023",
     "date": "2024-02-13",
-    "chapter": "01-39",
+    "chapter": "01-38",
     "hs_code": null,
     "rate": null,
     "cap": null,
-    "subject": "Notification of Indian Trade Classification (Harmonised System) of Export Items, 2023, Chapters 01-39 of Schedule 2, Export Policy of ITC (HS), 2023"
+    "subject": "Notification of Indian Trade Classification (Harmonised System) of Export Items, 2023, Chapters 01-39 of Schedule 2, Export Policy of ITC (HS), 2023",
+    "source_url": "https://content.dgft.gov.in/Website/English-Notification No. 60-2023.pdf"
+  },
+  {
+    "id": "006",
+    "doc_type": "Notification",
+    "number": "Notification No. 66/2024-25",
+    "date": "2025-03-20",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Extension of RoDTEP for AA/SEZ/EOU upto 5.2.2025",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/d2ebb661-0110-4d6f-ae0a-c54baaa448ed/Notification No.66 Eng.pdf"
+  },
+  {
+    "id": "007",
+    "doc_type": "Notification",
+    "number": "Notification No. 62/2024-25",
+    "date": "2025-03-10",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Amendment in Export Policy Condition under HSN of Schedule-II(Export Policy), ITC(HS) 2022",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/272450e1-c966-4002-8b28-bee171c1fe0e/Notification 62 -English.pdf"
+  },
+  {
+    "id": "008",
+    "doc_type": "Notification",
+    "number": "Notification No. 61/2024-25",
+    "date": "2025-03-07",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Amendment in Export Policy of Broken Rice under HS code 1006 40 00",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/9fcbf4f3-cdbc-460b-a63d-2c10a01d50f1/Notification 61 dated 07.03.2025 -English.pdf"
+  },
+  {
+    "id": "009",
+    "doc_type": "Notification",
+    "number": "Notification No. 59/2024-25",
+    "date": "2025-02-10",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Amendment in Export Policy of Raw Human Hair",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/cda30880-9f9f-45b7-92d9-797596eae47f/Notification 59 -English.pdf"
+  },
+  {
+    "id": "010",
+    "doc_type": "Notification",
+    "number": "Notification No. 57/2024-25",
+    "date": "2025-02-06",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Export of Broken Rice to Senegal through National Cooperative Exports Limited (NCEL) -reg",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/1ce3a969-9198-4076-80ae-6cf1dd799a0e/Notification 57 dated 06.02.2025 -Eng.pdf"
+  },
+  {
+    "id": "011",
+    "doc_type": "Notification",
+    "number": "Notification No. 56/2024-25",
+    "date": "2025-02-04",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Amendment in Export Policy of De-Oiled Rice Bran -reg.",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/91dfa668-a040-45c2-9169-d5879ba3df81/Notification No. 56 dated 04.02.2025 -Eng.pdf"
+  },
+  {
+    "id": "012",
+    "doc_type": "Notification",
+    "number": "Notification No. 53/2024-25",
+    "date": "2025-01-21",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Introduction of new Scheme as 'Diamond Imprest Authorisation' under Chapter 4 of Foreign Trade Policy 2023",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/0152d6c1-04b7-456f-922f-bece73ac57c6/Notification No 53.pdf"
+  },
+  {
+    "id": "013",
+    "doc_type": "Notification",
+    "number": "Notification No. 52/2024-25",
+    "date": "2025-01-20",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Amendment in Export Policy condition of Agarwood (Aquilaria Malaccensis) Chips and Powder and Agar Oil obtained from artificially propagated sources",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/ad8430f1-83fb-4b10-9d3d-2644bed10a57/Notification 52 -Eng.pdf"
+  },
+  {
+    "id": "014",
+    "doc_type": "Notification",
+    "number": "Notification No. 50/2024-25",
+    "date": "2025-01-13",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Notification of Schedule-II (Export Policy) of ITC(HS) 2022, in sync with Finance Act 2024 dated 16.08.2024 -reg.",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/7495bb34-84d4-4499-97af-417ab40dacb3/Notification 50 (English).pdf"
+  },
+  {
+    "id": "015",
+    "doc_type": "Notification",
+    "number": "Notification No. 48/2024-25",
+    "date": "2025-01-04",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Export of Wheat to Nepal through National Cooperative Exports Limited (NCEL) -reg",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/1a3a4c42-f486-4872-a70c-5a6b00420994/Notification 48 Eng.pdf"
+  },
+  {
+    "id": "016",
+    "doc_type": "Notification",
+    "number": "Notification No. 45/2024-25",
+    "date": "2024-12-30",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Imposition of Minimum Export Price (MEP) on Export of Honey.",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/c688e0ae-f5ec-4a3d-8fed-634898c1e112/Notification No 45 Eng.pdf"
+  },
+  {
+    "id": "017",
+    "doc_type": "Notification",
+    "number": "Notification No. 42/2024-25",
+    "date": "2024-12-05",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Export of Broken Rice to Senegal and Gambia through National Cooperative Exports Limited (NCEL) -reg.",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/48718501-2863-4b97-b933-5403ccf6b6de/Notification No 42-2024-25 (English).pdf"
+  },
+  {
+    "id": "018",
+    "doc_type": "Notification",
+    "number": "Notification No. 37/2024-25",
+    "date": "2024-10-23",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Amendment in Export Policy of Non-Basmati Rice under HS code 1006 30 90 -reg",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/28145972-b272-44ac-8778-c52502d4c5bd/Notification No. 37-2024-25 dated 23.10.2024 -English.pdf"
+  },
+  {
+    "id": "019",
+    "doc_type": "Notification",
+    "number": "Notification No. 38/2024-25",
+    "date": "2024-10-23",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Procedure for export of sesame seeds to the United States of America (USA) -reg.",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/b2547de0-01d0-4b27-9be9-1fe98879e327/Notification No. 38-2024-25 dated 23.10.2024 -Eng.pdf"
+  },
+  {
+    "id": "020",
+    "doc_type": "Notification",
+    "number": "Notification No. 35/2024-25",
+    "date": "2024-11-01",
+    "chapter": null,
+    "hs_code": null,
+    "rate": null,
+    "cap": null,
+    "subject": "Amendment in Export Policy condition of Cough Syrup under Chapter 30 of Schedule-II (Export Policy) of ITC (HS) 2022-reg.",
+    "source_url": "https://content.dgft.gov.in/Website/dgftprod/0370e22e-1fcb-4be2-9424-64cf85a995da/Notification No. 35-2024-25 -English.pdf"
   }
 ]

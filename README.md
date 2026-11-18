@@ -39,7 +39,7 @@ copy .env.example .env
 uv run uvicorn exportease.api.main:create_app --factory --reload
 ```
 
-`APP_ENV` must be `local`, `ci`, or `production`. The five records in
+`APP_ENV` must be `local`, `ci`, or `production`. The twenty records in
 `data/sample_records.json` are a JSON list; unavailable HS-code, rate, or cap
 values are `null` rather than inferred.
 
