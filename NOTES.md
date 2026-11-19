@@ -114,3 +114,15 @@ db started:  /ready  → HTTP 200 {"status":"ready","checks":{"database":true}}
 
 When the database is down, the load balancer should stop sending requests because the app isn't ready to serve them.
 It shouldn't restart the app: the process is healthy, and restarting it won't bring the database back.
+
+### Tests and coverage
+
+```text
+uv run poe test              → 16 passed in 0.36s
+uv run poe test-integration  → 7 passed in 3.49s
+coverage TOTAL, unit only    → TOTAL 286 67 34 2 73%
+coverage TOTAL, with integration tests → TOTAL 286 40 34 3 84%
+```
+
+`src/exportease/store.py` is unused by the current database-backed API; its zero coverage is not a runtime gap unless that legacy store is still meant to be supported.
+`src/exportease/__init__.py:2` is an unused placeholder `main()`; it matters only if a CLI entry point is added.
