@@ -86,6 +86,8 @@ uid=999(app) gid=999(app) groups=999(app)
 - Size: 300 MB (target: under 400 MB)
 - First build: not timed. After changing the Dockerfile entry point: not timed.
 - The dependency install step was CACHED because `pyproject.toml` and `uv.lock` had not changed.
+- The largest layer was `COPY --from=builder /app/.venv /app/.venv` at 96.2 MB; it contains the installed runtime dependencies.
+- Production run with `APP_ENV=production`: `/ready` returned HTTP 200 with `database: true`.
 
 ### The stack
 
@@ -104,6 +106,8 @@ docker compose logs migrate (after down + up)
 migrate-1  | records=20 inserted=0 updated=0 unchanged=20
 ```
 
+With `restart: true` under `api.depends_on.db`, `docker compose restart db` restarted the API too; `/ready` returned HTTP 200 with `database: true`.
+
 ### Breaking the database on purpose
 
 ```text
@@ -118,11 +122,14 @@ It shouldn't restart the app: the process is healthy, and restarting it won't br
 ### Tests and coverage
 
 ```text
-uv run poe test              → 16 passed in 0.36s
-uv run poe test-integration  → 7 passed in 3.49s
-coverage TOTAL, unit only    → TOTAL 286 67 34 2 73%
-coverage TOTAL, with integration tests → TOTAL 286 40 34 3 84%
+uv run poe test              → 17 passed in 0.38s
+uv run poe test-integration  → 7 passed in 4.03s
+coverage TOTAL, unit only    → TOTAL 286 62 34 2 74%
+coverage TOTAL, with integration tests → TOTAL 286 44 34 2 81%
+uv run pytest --cov --cov-report=html → 17 passed, 7 skipped; HTML report 74%
 ```
+
+The new `check_db` failure test covers the exception branch and its `return False` line.
 
 `src/exportease/store.py` is unused by the current database-backed API; its zero coverage is not a runtime gap unless that legacy store is still meant to be supported.
 `src/exportease/__init__.py:2` is an unused placeholder `main()`; it matters only if a CLI entry point is added.
