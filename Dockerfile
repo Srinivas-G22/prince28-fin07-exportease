@@ -37,4 +37,4 @@ USER app
 EXPOSE 8000
 
 # Hosts like Render pass the port in $PORT; locally it defaults to 8000.
-CMD ["sh", "-c", "exec uvicorn genericfinder.api.main:create_app --factory --host 0.0.0.0 --port ${PORT:-8000} --no-access-log"]
+CMD ["sh", "-c", "exec uvicorn exportease.api.main:create_app --factory --host 0.0.0.0 --port ${PORT:-8000} --no-access-log"]
