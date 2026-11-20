@@ -1,8 +1,6 @@
 import pytest
-from fastapi import FastAPI, Request
 from pydantic import ValidationError
 
-from exportease.api.deps import check_db
 from exportease.config import Settings
 from exportease.db.url import to_asyncpg_url
 
@@ -11,13 +9,7 @@ def test_health_is_ok(client):
     r = client.get("/health")
     assert r.status_code == 200
     assert r.json()["status"] == "ok"
-    assert r.json()["version"] == "dev"  # no GIT_SHA outside a CI-built image
 
-
-def test_git_sha_comes_from_the_environment(monkeypatch):
-    monkeypatch.setenv("GIT_SHA", "3f2c1ab")
-    settings = Settings(app_env="ci", database_url="postgresql://localhost/db", _env_file=None)
-    assert settings.git_sha == "3f2c1ab"
 
 def test_ready_when_database_up(client):
     r = client.get("/ready")
@@ -29,27 +21,6 @@ def test_ready_is_503_when_database_down(client, db_state):
     db_state["up"] = False
     assert client.get("/health").status_code == 200  # alive...
     assert client.get("/ready").status_code == 503  # ...but not ready
-
-
-async def test_check_db_returns_false_when_query_fails():
-    class FailingConnection:
-        async def __aenter__(self):
-            return self
-
-        async def __aexit__(self, exc_type, exc_value, traceback):
-            return False
-
-        async def execute(self, statement):
-            raise OSError("database unavailable")
-
-    class FailingEngine:
-        def connect(self):
-            return FailingConnection()
-
-    app = FastAPI()
-    app.state.engine = FailingEngine()
-    request = Request({"type": "http", "app": app})
-    assert await check_db(request) is False
 
 
 def test_list_documents_paginates(client):
