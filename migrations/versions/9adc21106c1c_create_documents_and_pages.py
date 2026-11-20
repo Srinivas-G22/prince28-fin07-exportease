@@ -1,7 +1,7 @@
 """create documents and pages
 
 Revision ID: 9adc21106c1c
-Revises: 
+Revises:
 Create Date: 2026-11-18 13:12:36.668037
 
 """
