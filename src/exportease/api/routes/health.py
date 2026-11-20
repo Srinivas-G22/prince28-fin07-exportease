@@ -16,6 +16,12 @@ def health(settings: SettingsDep) -> dict[str, str]:
     }
 
 
+@router.head("/health", include_in_schema=False)
+def health_head() -> Response:
+    """Allow uptime monitors to check liveness without downloading a body."""
+    return Response(status_code=200)
+
+
 @router.get("/ready")
 async def ready(db_ok: DbCheckDep, response: Response) -> dict:
     """Readiness: can this instance serve traffic right now?"""
