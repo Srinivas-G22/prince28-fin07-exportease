@@ -1,4 +1,5 @@
 # Runs on every "git commit". If a hook fails, the commit is stopped.
+exclude: ^\.venv[^/]*/
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -20,5 +21,5 @@ repos:
     rev: v1.5.0
     hooks:
       - id: detect-secrets
-        # uv.lock hashes and Alembic revision ids look random but are not secrets
+        # uv.lock hashes and Alembic revision ids look random but are not secrets.
         exclude: ^(uv\.lock|migrations/versions/.*)$
