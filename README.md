@@ -1,8 +1,15 @@
 # ExportEase
 
+[![CI](https://github.com/Srinivas-G22/prince28-fin07-exportease/actions/workflows/ci.yml/badge.svg)](https://github.com/Srinivas-G22/prince28-fin07-exportease/actions/workflows/ci.yml)
+[![Live](https://img.shields.io/website?url=https%3A%2F%2Fexportease-vu6o.onrender.com%2Fhealth&label=live)](https://exportease-vu6o.onrender.com/docs)
+[![Uptime (30 days)](https://img.shields.io/uptimerobot/ratio/m804746529-f7eaf7ffbd2112b8497c8816)](https://exportease-vu6o.onrender.com/health)
+
+**Live:** https://exportease-vu6o.onrender.com · [API docs](https://exportease-vu6o.onrender.com/docs) · [health](https://exportease-vu6o.onrender.com/health)
+
+
 Answers export policy questions for small exporters: Foreign Trade Policy rules, RoDTEP rates, Advance Authorisation and documentation, citing DGFT notifications.
 
-**Status:** Day 1 foundation (FastAPI skeleton, quality gates). Live URL from Day 5.
+**Status:** Week 1 complete · live at https://exportease-vu6o.onrender.com
 
 ## Who it's for
 

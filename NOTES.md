@@ -133,3 +133,50 @@ The new `check_db` failure test covers the exception branch and its `return Fals
 
 `src/exportease/store.py` is unused by the current database-backed API; its zero coverage is not a runtime gap unless that legacy store is still meant to be supported.
 `src/exportease/__init__.py:2` is an unused placeholder `main()`; it matters only if a CLI entry point is added.
+
+## D05 · CI/CD and going live
+
+- Live URL: https://exportease-vu6o.onrender.com
+- CI run for pull request 1: [Actions run list](https://github.com/Srinivas-G22/prince28-fin07-exportease/actions) — paste the successful run URL from the PR Checks tab.
+- First deploy that ran by itself: paste the CD run URL from Actions.
+- Merge commit for PR #7 recorded at 15:34 IST on 2026-11-20; exact click time, smoke-test completion time, and lead time: not captured yet.
+
+### Smoke test output from that CD run
+
+```text
+[Paste the last 4 lines of the "Smoke test the live URL" step from the CD run.]
+```
+
+### Rollback drill
+
+- Rolled back to SHA `a159742aaa166d8e07c41a508b48c010cd76447f`: start time, smoke-test time, and duration not captured yet.
+- Rolled forward to SHA `14a370903e72c2c2b0699b94314d3a9782b445b9`: duration not captured yet.
+- The manual rollback workflow skips migrations, so the database remains at its current schema. The migration files are unchanged between these SHAs, so the newer schema is compatible with the older application image for this drill.
+
+### Where my secrets live
+
+- Neon string: GitHub Secret `DATABASE_URL` + Render environment. Not in Git, not in the image.
+- Render deploy hook: GitHub Secret `RENDER_DEPLOY_HOOK` only.
+
+### Monitoring
+
+- UptimeRobot checks `/health` every 5 minutes; alerts go to my email.
+- An always-on Render instance would avoid the free service's cold start after 15 minutes without traffic. [Render free instance details](https://render.com/docs/free)
+
+### Human gate (continuous delivery)
+
+A required reviewer is worth the delay for production changes that could affect customers, data, or compliance; the approval gives someone a chance to review risk and timing.
+For routine low-risk changes with strong automated checks and a quick rollback, the approval wait can cost more than it reduces risk.
+
+### Change lead time
+
+Record merge and smoke-test completion times in IST for three CD runs. Lead time is the interval between them.
+
+| CD run | Merge time (IST) | “Smoke test passed” time (IST) | Lead time |
+| --- | --- | --- | --- |
+| 1 | pending | pending | pending |
+| 2 | pending | pending | pending |
+| 3 | pending | pending | pending |
+| **Average** |  |  | **pending** |
+
+Slowest step: pending until the three CD run logs are compared.
