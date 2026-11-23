@@ -180,3 +180,58 @@ Record merge and smoke-test completion times in IST for three CD runs. Lead time
 | **Average** |  |  | **pending** |
 
 Slowest step: pending until the three CD run logs are compared.
+
+
+[   1] downloaded     133.6 kB  data/raw/dgft/cp-bfe514a8.html
+[   2] downloaded     468.9 kB  data/raw/dgft/chapter-4-revised-ftp-2026-e3f07c4b.pdf
+[   3] downloaded     553.9 kB  data/raw/dgft/hbp-07-2026-chapter-04-48a75a30.pdf
+[   4] downloaded     373.3 kB  data/raw/dgft/chapter-5-revised-ftp-v1-2-2-7807ba71.pdf
+[   5] downloaded    2510.8 kB  data/raw/dgft/appendix-4r-wef-10th-october-2024-747d25c7.pdf
+[   6] downloaded    2453.2 kB  data/raw/dgft/appendix-4re-wef-10-october-2024-2c7860df.pdf
+[   7] downloaded     267.6 kB  data/raw/dgft/notification-no-11-25-26-english-cd10556e.pdf
+[   8] downloaded     292.0 kB  data/raw/dgft/notification-no-10-25-26-english-89413544.pdf
+[   9] downloaded     453.3 kB  data/raw/dgft/notification-no-15-dt-30-04-2026-7b8a8b6b.pdf
+[  10] downloaded     292.0 kB  data/raw/dgft/changes-to-be-made-in-appendix-4r-and-appendix-4re-5f8c9fd4.pdf
+
+## D06 · Collecting the corpus
+
+- Start target: FTP 2023 + Handbook + 200 notices
+- Collected today: 30 files, 913 pages, 16.8 MB (from `DATASET.md`; includes one HTML lookup page)
+- Doors used: URL list (30 DGFT source rows); Git repository (4 Markdown files from `docs/`); sitemap (attempted, DGFT sitemap returned 404); by hand (manual registration checked, added 0 because files were already registered)
+
+### Licence check
+
+| Source | Licence or terms, in my words | May I show full text in answers? |
+|---|---|---|
+| DGFT | Use for research/reference; cite the instrument number and date; third-party rights are reserved; get DGFT permission before republishing. | No, not without DGFT permission. |
+| ExportEase GitHub docs | Internal project reference; no repository licence was found, so do not treat the files as openly licensed. | Only for this project; do not redistribute as a licensed source. |
+
+### robots.txt
+
+- Site: `https://www.dgft.gov.in/robots.txt`
+- robots.txt result, two lines: `HTTP 404`; no directives were returned.
+- Was anything blocked for my bot? No: `DATASET.md` reports 0 blocked and 0 failed. I did not treat the missing sitemap as a robots block or invent URLs.
+
+### Kill and resume
+
+- Run 1: Ctrl+C status was not recorded; the saved output shows 10 files downloaded.
+- Run 2: downloaded=20 skipped=10
+- Run 3: downloaded=0 skipped=30
+
+### Capacity (from `docs/CAPACITY.md`)
+
+- Tokens per page, measured: 535
+- Full corpus: 3.21 M tokens, 9,225 chunks, embedding about Rs 53, vectors 28 MB
+- The number that surprised me most, and why:
+  - The measured start corpus is already about 0.49 M tokens, despite having only 30 files.
+  - 20 files have almost no extracted text, so OCR and parsing may matter more than embedding cost.
+
+### One thing that went wrong today, and how I fixed it
+
+DGFT's sitemap URL returned 404, so discovery could not proceed. I used the collected URL list and local PDFs instead, and rerunning the downloader safely skipped files already present.
+
+### Crawl metrics from the manifest
+
+- Files and size by source: DGFT — 30 files, 16.8 MB; `exportease-docs` — 4 files, 0.02 MB.
+- Slowest site: not measurable from this manifest because request durations were not recorded; DGFT is the only publisher represented in the URL downloads.
+- Retry count: 0 of 34 downloaded files needed more than one attempt.
