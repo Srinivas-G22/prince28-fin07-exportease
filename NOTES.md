@@ -235,3 +235,66 @@ DGFT's sitemap URL returned 404, so discovery could not proceed. I used the coll
 - Files and size by source: DGFT — 30 files, 16.8 MB; `exportease-docs` — 4 files, 0.02 MB.
 - Slowest site: not measurable from this manifest because request durations were not recorded; DGFT is the only publisher represented in the URL downloads.
 - Retry count: 0 of 34 downloaded files needed more than one attempt.
+
+## D07 · Document parsing
+
+- Most common parse failure: `no_text_layer` (22 files before retry), caused by
+  image-only scanned PDFs.
+- Fixed `notification-no-11-25-26-english-cd10556e.pdf` with the parser's Tesseract
+  OCR path (`--ocr eng`): 1 page, initially 1,406 characters. I visually checked the
+  scan and corrected the OCR's notice number to `11/2025-26` and date to `26 May,
+  2025`; the stored page is now 1,405 characters. The raw PDF is unchanged and its
+  `parse_failures` row was cleared.
+- Then ran `uv run python scripts/parse_corpus.py --retry-failed`: 9 files were
+  already parsed, 21 still failed with `no_text_layer`, and all 21 remaining
+  `parse_failures` rows now have `attempts = 2`.
+- Result: 9 of 30 files parsed; 21 still need OCR or better source copies. The
+  no-failure 10-file comparison extra does not apply.
+
+## D07 · Parser comparison
+
+Selected table-heavy RoDTEP appendices, long FTP/HBP chapters, low-text scanned notices,
+and the DGFT HTML lookup page.
+
+<!-- parsers:start -->
+| File | Parsers (A / B) | Pages | A found | B found | Time (A / B) | Better, why |
+|---|---|---|---|---|---|---|
+| appendix-4r-wef-10th-october-2024-747d25c7.pdf | PyMuPDF / pypdf | 252 | 569,112 chars, 0 headings, 0 tables | 569,112 chars, 0 headings, 0 tables | 45.60 s / 42.51 s | Tie: both take about 43–46 s and extract the same text; the stored first page is a flat code/rate list, with no heading paths or table grid. |
+| appendix-4re-wef-10-october-2024-2c7860df.pdf | PyMuPDF / pypdf | 155 | 550,722 chars, 0 headings, 0 tables | 550,722 chars, 0 headings, 0 tables | 22.17 s / 22.88 s | Tie: same text and nearly the same time; the stored page is a flat code/rate list, so neither adds table or section structure. |
+| changes-to-be-made-in-appendix-4r-and-appendix-4 | PyMuPDF / pypdf | - | FAILED: no_text_layer | 17,789 chars, 0 headings, 0 tables | 17.24 s / 1.27 s | pypdf wins: it recovers 17,789 chars of row text in 1.27 s; PyMuPDF rejects the sparse text layer after 17.24 s. |
+| chapter-4-revised-ftp-2026-e3f07c4b.pdf | PyMuPDF / pypdf | 16 | 55,947 chars, 134 headings, 0 tables | 55,091 chars, 0 headings, 0 tables | 0.87 s / 2.56 s | PyMuPDF wins: +856 chars and 134 headings in 0.87 s; pypdf has no headings and takes 2.56 s. |
+| chapter-5-revised-ftp-v1-2-2-7807ba71.pdf | PyMuPDF / pypdf | 6 | 11,580 chars, 30 headings, 0 tables | 11,395 chars, 0 headings, 0 tables | 0.24 s / 0.50 s | PyMuPDF wins: +185 chars and 30 navigable headings in half the time; pypdf returns unstructured text. |
+| hbp-07-2026-chapter-04-48a75a30.pdf | PyMuPDF / pypdf | 55 | 117,742 chars, 158 headings, 6 tables | 115,613 chars, 0 headings, 0 tables | 1.62 s / 3.59 s | PyMuPDF wins: +2,129 chars, 158 headings and 6 tables vs pypdf's 0; page 4 has the matching section path and a rough Markdown grid with split/duplicate cells. |
+| notification-no-70-dated-08-03-2024-english-abf1 | PyMuPDF / pypdf | - | FAILED: no_text_layer | FAILED: no_text_layer | 0.01 s / 0.00 s | Neither: both find no usable text layer; OCR is required. |
+| notification-no-53-54baccd6.pdf | PyMuPDF / pypdf | - | FAILED: no_text_layer | FAILED: no_text_layer | 0.01 s / 0.01 s | Neither: both find no usable text layer; OCR is required. |
+| notification-32-eng-f28fcd34.pdf | PyMuPDF / pypdf | - | FAILED: no_text_layer | FAILED: no_text_layer | 0.01 s / 0.00 s | Neither: both find no usable text layer; OCR is required. |
+| cp-bfe514a8.html | trafilatura / strip tags | 1 | 454 chars, 0 headings, 0 tables | 9,732 chars, 0 headings, 0 tables | 0.35 s / 0.01 s | Trafilatura wins for answers: 454 chars keep the policy summary; the 9,732-char tag-stripped output is mostly navigation/chrome, despite being faster. |
+<!-- parsers:end -->
+
+### D07 · Parsing my corpus
+
+- Files in the manifest: 30 · parsed: 9 · failed: 21 · pages in Postgres: 868
+- Parsing coverage: 30% of files (9/30)
+
+#### Failures by reason
+
+| Reason | Files | What I did |
+|---|---:|---|
+| `no_text_layer` | 21 | These are image-only scans; I OCR'd one with Tesseract and the remaining 21 still need OCR or a text-based source copy. |
+
+- The one I fixed: `notification-no-11-25-26-english-cd10556e.pdf`, reason `no_text_layer`, fix: ran `--ocr eng`, then corrected the notice number and date against the scan.
+
+#### What I saw when I read my parsed pages
+
+- A page where the heading path is right (document, page, path): HBP Chapter 4, page 4 — `Duty Exemption / Remission Schemes > 4.01 Policy > 4.06 Fixation of Norms`.
+- Something that came out wrong (document, page, what): RoDTEP Appendix 4R, page 1 — tariff codes and rates became a continuous text list, so the column relationships are hard to recover.
+- A table: Markdown grid or loose text? (document, page): HBP Chapter 4, page 4 — a rough Markdown grid; headers split across cells and some committee rows repeat.
+
+#### My parser choice
+
+- For PDFs I use PyMuPDF for most files and pypdf for files over 2 MB: HBP Chapter 4 had 158 headings and 6 tables with PyMuPDF versus 0 and 0 with pypdf (1.62 s vs 3.59 s). The 252-page Appendix 4R produced equal character counts with both; pypdf was about 3 seconds faster.
+- A kind of document in my corpus that neither parser handles well: image-only scanned notices; both report `no_text_layer`, so they need OCR.
+
+#### One thing that went wrong today, and how I fixed it
+
+The first parse marked scanned notices as `no_text_layer`. I retried one with Tesseract OCR (`--ocr eng`), checked the output against the scan, and corrected its notice number and date; 21 scanned files remain for OCR or text-based copies.

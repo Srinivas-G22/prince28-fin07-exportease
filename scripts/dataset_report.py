@@ -41,6 +41,7 @@ class VisibleText(HTMLParser):
         self._hidden = 0
 
     def handle_starttag(self, tag: str, attrs: list) -> None:
+        del attrs
         self._hidden += tag in {"script", "style", "noscript"}
 
     def handle_endtag(self, tag: str) -> None:

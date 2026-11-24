@@ -64,7 +64,12 @@ def main() -> int:
 
     # 2) Ready? Give a sleeping database (Neon scales to zero) up to a minute to wake.
     soon = min(deadline, time.monotonic() + 60)
-    ok, status, body = wait_for(f"{base}/ready", lambda s, b: s == 200, soon, 5)
+
+    def ready_status(status: int, body: dict) -> bool:
+        del body
+        return status == 200
+
+    ok, status, body = wait_for(f"{base}/ready", ready_status, soon, 5)
     print(f"{'ok  ' if ok else 'FAIL'} /ready -> {status} {body}")
     if not ok:
         return 1

@@ -22,6 +22,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
+        del app
         logger.info("starting", extra={"status": settings.app_env})
         yield
         await engine.dispose()  # close every pooled connection on shutdown

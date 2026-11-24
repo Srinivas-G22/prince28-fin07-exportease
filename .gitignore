@@ -11,6 +11,7 @@ __pycache__/
 !.env.example
 # Big data stays out of Git
 data/raw/
+data/parsed/
 # Editors / OS
 .vscode/
 .idea/
