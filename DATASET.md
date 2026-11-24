@@ -88,4 +88,15 @@ for digest, files in groups.items():
 
 ## Known gaps
 
-- (what is still missing from the start target, and why)
+- DGFT's [Notifications register](https://www.dgft.gov.in/CP/?opt=notification) lists
+  Notification 10/2025-26 (26 May 2025, RoDTEP schedule alignment) and links to this
+  [official PDF](https://content.dgft.gov.in/Website/dgftprod/d9efefc9-3230-491b-a3f2-70f6ade996d4/Notification%20No.10.25-26%20English.pdf).
+  Its embedded page image and rendered pixels match the local copy exactly, although
+  the PDF container hashes differ. Both PDFs are image-only (zero embedded text; one
+  page image), and no separate text-based copy was found on DGFT.
+- The OCR at `data/parsed/notification10-ocr.jsonl` was checked against the scan.
+  The notice number (10/2025-26), date (26 May 2025), subject, effective date
+  (01.05.2025), and main text are confirmed. The OCR is not a verbatim transcript: it
+  misreads Gazette subsection (ii) and the handwritten number, splits the date, and
+  omits the signatory name, Ajay Bhadoo. Treat those fields as visually verified
+  corrections; the raw OCR output remains imperfect.

@@ -211,6 +211,7 @@ async def test_broken_connection_leaves_no_half_file(tmp_path):
         return httpx.Response(200, content=body(), headers={"Content-Type": "text/html"})
 
     async def no_sleep(seconds: float) -> None:
+        del seconds
         return None
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:

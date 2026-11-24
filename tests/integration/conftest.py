@@ -23,6 +23,7 @@ BASE_URL = os.getenv("TEST_DATABASE_URL")
 
 
 def pytest_collection_modifyitems(config, items):
+    del config
     if BASE_URL:
         return
     skip = pytest.mark.skip(reason="set TEST_DATABASE_URL to run integration tests")

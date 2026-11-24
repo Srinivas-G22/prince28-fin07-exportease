@@ -38,9 +38,11 @@ async def test_check_db_returns_false_when_query_fails():
             return self
 
         async def __aexit__(self, exc_type, exc_value, traceback):
+            del exc_type, exc_value, traceback
             return False
 
         async def execute(self, statement):
+            del statement
             raise OSError("database unavailable")
 
     class FailingEngine:
