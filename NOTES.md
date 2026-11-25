@@ -298,3 +298,44 @@ and the DGFT HTML lookup page.
 #### One thing that went wrong today, and how I fixed it
 
 The first parse marked scanned notices as `no_text_layer`. I retried one with Tesseract OCR (`--ocr eng`), checked the output against the scan, and corrected its notice number and date; 21 scanned files remain for OCR or text-based copies.
+
+## D08 · LLM gateway
+
+- Primary model: Gemini `gemini-3.8-flash`; fallback: Groq `openai/gpt-oss-20b`.
+- `POST /v1/chat` accepts a message and streams server-sent events by default. Set `stream: false` for one JSON response.
+- `GET /v1/usage?days=7` reports calls, errors, fallbacks, tokens, and estimated cost in rupees, grouped by India-local day.
+- API keys belong in local `.env` and the deployment's secret settings. `.env.example` contains blank key values.
+
+### Live measurements
+
+Question asked both times: “When will my pending RoDTEP credit be released?”
+
+| Live request | Provider / model | First words | Total | Tokens in / out | Cost | Attempts / fallback |
+|---|---|---:|---:|---:|---:|---|
+| First request in this run | Groq `openai/gpt-oss-20b` | 8.11 s | 8.35 s | 244 / 213 | Rs 0.007809 | 3 / yes |
+| Second, awake request | Groq `openai/gpt-oss-20b` | 2.89 s | 3.00 s | 244 / 203 | Rs 0.007524 | 3 / yes |
+
+Both requests streamed an answer. The awake request's first words arrived in 2.89 s, above the Day 1 target of under 1.5 s. Render may take longer after its free instance sleeps; this run's first request took 8.11 s.
+
+The English-versus-Tamil token comparison has not been run yet. To compare it, send the same question in both languages using `uv run python scripts/ask.py "..." --json` and record `tokens in`. Keep the model and prompt the same; the system prompt contributes to both counts.
+
+### Behavior and resilience
+
+- The system prompt says the DGFT documents are not connected yet. It instructs the assistant to answer from general knowledge, stay within 120 words, avoid inventing citations or dates, and say “I am not sure” when uncertain.
+- Both live answers claimed that RoDTEP credit is released in about 30 days, but gave different starting points: application submission in the first answer and acceptance in the second. Neither answer cited a DGFT source, and I did not verify a 30-day rule. The assistant did not say “I am not sure.” Treat that timeline as unsupported; export-policy documents are not connected to chat yet.
+- An off-topic question has not been tested yet.
+- Automated tests use fake providers: they verify retries, fallback to Groq after Gemini errors, mid-stream error reporting, and the circuit breaker. The breaker opens after 3 consecutive failures and allows one probe after its 30-second cooldown. These are test results, not a live outage drill.
+
+### Usage and cost
+
+`GET /v1/usage?days=1` on 25 Nov 2026 returned the following day-to-date totals:
+
+| Calls | Errors | Fallback calls | Tokens in / out | Estimated cost |
+|---:|---:|---:|---:|---:|
+| 33 | 18 | 15 | 3,655 / 3,298 | Rs 0.12 |
+
+These are provider-call totals for the day, not just the two requests above. Because retries create separate provider-call rows, this aggregate does not give a reliable average cost per user question. Costs are estimates from configured model prices and the USD-to-INR setting, not a billing statement.
+
+### One thing that went wrong today, and how I fixed it
+
+The first test run could not import the chat API: `chat.py` was at the repository root, and the dependency module pointed to a nonexistent repository path. I moved the route into `src/exportease/api/routes/` and corrected the import. I also included the prompt file in the runtime Docker image so app startup can load it. The unit suite passes (88 passed). In the live check, the model then made an unsupported 30-day claim; I recorded the contradiction and did not treat it as DGFT guidance. Retrieval from the actual policy documents is still needed to answer this question reliably.
