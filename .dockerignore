@@ -12,6 +12,9 @@ __pycache__/
 htmlcov/
 tests/
 data/raw/
+data/parsed/
 docker/
 *.md
 !README.md
+!prompts/
+!prompts/*.md

@@ -7,9 +7,11 @@ from fastapi import APIRouter, FastAPI
 
 from exportease.api.errors import register_error_handlers
 from exportease.api.middleware import request_context
-from exportease.api.routes import documents, health
+from exportease.api.routes import chat, documents, health
 from exportease.config import Settings, get_settings
+from exportease.db.llm_calls import make_recorder
 from exportease.db.session import make_engine, make_sessionmaker
+from exportease.llm.gateway import build_gateway
 from exportease.logging_setup import setup_logging
 
 logger = logging.getLogger("exportease")
@@ -22,21 +24,28 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        del app
         logger.info("starting", extra={"status": settings.app_env})
-        yield
-        await engine.dispose()  # close every pooled connection on shutdown
+        try:
+            yield
+        finally:
+            try:
+                await app.state.gateway.aclose()
+            finally:
+                await engine.dispose()  # close every pooled connection on shutdown
 
     app = FastAPI(title=settings.app_name, version="0.2.0", lifespan=lifespan)
     app.state.settings = settings
     app.state.engine = engine
     app.state.sessionmaker = make_sessionmaker(engine)
+    app.state.system_prompt = chat.load_prompt(settings.prompts_dir)  # missing file: no start
+    app.state.gateway = build_gateway(settings, make_recorder(app.state.sessionmaker))
 
     app.middleware("http")(request_context)
     register_error_handlers(app)
 
     v1 = APIRouter(prefix="/v1")
     v1.include_router(documents.router)
+    v1.include_router(chat.router)
     app.include_router(health.router)
     app.include_router(v1)
     return app
