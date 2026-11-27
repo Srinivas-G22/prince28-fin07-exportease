@@ -377,7 +377,7 @@ The first test run could not import the chat API: `chat.py` was at the repositor
 
 ### One thing that went wrong today, and how I fixed it
 
-The primary Gemini model hit its quota while extracting metadata. The gateway's fallback model completed the records, so the run finished with 29 valid results and no failed documents. I also checked a long RoDTEP schedule and found a valid but incomplete summary; that extraction still needs a better document-wide summary strategy.
+The primary Gemini model hit its quota while extracting metadata. The gateway's fallback model completed the records, so the run finished with 29 valid results and no failed documents. I also checked a long RoDTEP sch edule and found a valid but incomplete summary; that extraction still needs a better document-wide summary strategy.
 
 ## D10 - Filtering extracted document metadata
 
@@ -405,3 +405,34 @@ The existing `/v1/documents` endpoint filtered the new metadata without a new en
 - `compare_prompts.py` now prints a confusion table for each router version. `classify_v2` was correct for all 9 docs, 6 personal, and 5 off-topic questions; v3 and v4 each returned `invalid` for docs test line 8.
 - Asked “When will my pending RoDTEP credit be released?” through local `/v1/chat`. The router classified it as `personal` and returned: “I can't know that from public export-policy documents, and I can't see your individual case or live status.” The two `FakeLLM` tests verify personal and off-topic questions return a fixed sentence after one call, with no answer-generation call.
 - Focused API and extraction tests: 29 passed. `uv run poe lint`: passed.
+
+### D10 · Queue and worker
+
+- First run: ___ documents queued, finished in ___ s. Done ___ , skipped ___ , failed ___
+- Pace: ___ s per document (INGEST_RPM = ___ , INGEST_CONCURRENCY = ___ )
+
+### Kill test
+
+- Queued: 20. At the kill: queued ___ , running ___ , done ___ , failed ___
+- After the new worker: done ___ + skipped ___ + failed ___ = ___ (must be 20)
+- Documents in the database: ___ , different ids: ___ (must be equal)
+- The interrupted items came back after ___ s. Why that long:
+- Why nothing was doubled (one sentence, in my own words):
+
+### Dead-letter list
+
+| Stage (parse / extract / download / gave up) | Items | What I did |
+|---|---|---|
+| | | |
+
+### Live ingestion
+
+- ExportEase on Render: ___ of 5 documents done, ___ failed. The reasons:
+- A request without the token gets status ___
+
+### Week 2 against Monday's estimate
+
+- docs/CAPACITY.md said: ___ pages, ___ tokens. docs/INGEST_REPORT.md says: ___ pages, ___ tokens
+- The difference, and why:
+
+### One thing that went wrong today, and how I fixed it
