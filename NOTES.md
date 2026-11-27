@@ -75,11 +75,11 @@ When the table is larger or the filter selective enough that using the index cos
 ### The image
 
 ```text
-docker images genericfinder:dev
+docker images exportease:dev
 IMAGE               ID             DISK USAGE   CONTENT SIZE   EXTRA
-genericfinder:dev   146caec10c1d        300MB           70MB
+exportease:dev      146caec10c1d        300MB           70MB
 
-docker run --rm genericfinder:dev id
+docker run --rm exportease:dev id
 uid=999(app) gid=999(app) groups=999(app)
 ```
 
@@ -94,10 +94,10 @@ uid=999(app) gid=999(app) groups=999(app)
 ```text
 docker compose ps -a
 NAME                      IMAGE                    COMMAND                  SERVICE   CREATED         STATUS                     PORTS
-genericfinder-api-1       genericfinder-api        "sh -c 'exec uvicorn…"   api       3 minutes ago   Up 2 minutes (healthy)     0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
-genericfinder-db-1        pgvector/pgvector:pg17   "docker-entrypoint.s…"   db        3 minutes ago   Up 2 minutes (healthy)     0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp
-genericfinder-migrate-1   genericfinder-migrate    "sh -c 'alembic upgr…"   migrate   3 minutes ago   Exited (0) 2 minutes ago
-genericfinder-redis-1     redis:7-alpine           "docker-entrypoint.s…"   redis     3 minutes ago   Up 3 minutes (healthy)     0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp
+exportease-api-1       exportease-api        "sh -c 'exec uvicorn…"   api       3 minutes ago   Up 2 minutes (healthy)     0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+exportease-db-1        pgvector/pgvector:pg17   "docker-entrypoint.s…"   db        3 minutes ago   Up 2 minutes (healthy)     0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp
+exportease-migrate-1   exportease-migrate    "sh -c 'alembic upgr…"   migrate   3 minutes ago   Exited (0) 2 minutes ago
+exportease-redis-1     redis:7-alpine           "docker-entrypoint.s…"   redis     3 minutes ago   Up 3 minutes (healthy)     0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp
 
 docker compose logs migrate (first up)
 migrate-1  | records=20 inserted=20 updated=0 unchanged=0

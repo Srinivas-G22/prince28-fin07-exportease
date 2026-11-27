@@ -1,6 +1,6 @@
 # One command for the whole stack:  docker compose up --build
 # Local development only: these passwords never leave your laptop.
-name: genericfinder
+name: exportease
 
 services:
   db:
