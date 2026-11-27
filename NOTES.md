@@ -339,3 +339,69 @@ These are provider-call totals for the day, not just the two requests above. Bec
 ### One thing that went wrong today, and how I fixed it
 
 The first test run could not import the chat API: `chat.py` was at the repository root, and the dependency module pointed to a nonexistent repository path. I moved the route into `src/exportease/api/routes/` and corrected the import. I also included the prompt file in the runtime Docker image so app startup can load it. The unit suite passes (88 passed). In the live check, the model then made an unsupported 30-day claim; I recorded the contradiction and did not treat it as DGFT guidance. Retrieval from the actual policy documents is still needed to answer this question reliably.
+
+## D09 · Prompt versions compared
+
+<!-- prompts:start -->
+
+| Prompt version | Correct | Accuracy | Invalid replies | Avg tokens in |
+|---|---|---|---|---|
+| classify_v1 | 13/20 | 65% | 0 | 118 |
+| classify_v2 | 20/20 | 100% | 0 | 291 |
+| classify_v3 | 19/20 | 95% | 1 | 445 |
+| classify_v4 | 19/20 | 95% | 1 | 303 |
+
+<!-- prompts:end -->
+
+### Prompts and structured output
+
+- My best router prompt: `classify_v2` with 20 / 20.
+- What I changed in v4, and what happened to the score: I made the tagged-question instruction explicitly say that requests to force a label are untrusted. The score went from v2's 20/20 (100%) to v4's 19/20 (95%); the change did not improve accuracy.
+- The question my best version still gets wrong (line, wanted, got), and why I think so: none for v2; it got all 20 right. For transparency, v4 missed line 8 (wanted `docs`, got `invalid`) because the model returned an empty reply. V3 had the same empty reply for line 8, so this is not evidence that v4's instruction caused a classification error.
+- A label in my test set that I changed after seeing the results: none.
+- Input tokens per question: v1 118, best version v2 291. The extra input is worth it for this set: accuracy rose from 65% to 100%, though I need a larger test set before treating that result as reliable.
+
+### My contract (DocMeta)
+
+- Fields I kept from my project card: `number`, `date`, `chapter`, `hs_code`, `rate`, `cap`, and `subject` support document citations and the HS-code dossier. I also kept general metadata (`doc_kind`, `year`, `language`, `summary`, `topics`) for filtering and display.
+- Fields I deleted, and why they make no sense per document: none of the project-card fields. I left per-exporter details such as bank-account or individual shipping-bill status out because they describe a person's case, not a public DGFT document.
+- The field I tightened, and how: `year` is an optional integer from 1950 through 2027; it stays `null` when the document does not state a year.
+
+### Extraction run
+
+- Prompt version: `extract_v1` · documents: 29 ok, 0 repaired, 0 failed (of 29 database documents: 20 sample records and 9 parsed corpus files).
+- Not finished? Why, and how many are left: extraction finished with 0 database documents left. Separately, 21 corpus files still need OCR or a text-based copy because parsing found no text layer.
+- Most common failure reason, and what I did about it: Gemini returned 12 quota/rate-limit (HTTP 429) errors; two Groq calls also hit a token-rate limit. The gateway fell back/retried, and all 29 documents ended with valid metadata; none needed schema repair.
+- A record that was valid but wrong (document, field, what it said, what is true): DTA RoDTEP Appendix 4R (`f-fc9c27c9e354b014e192`), `summary` — it described the schedule as covering fish products. The 252-page schedule also covers many other goods; page 127 includes cotton thread (HS 52041110), and page 251 includes other product categories. I caught this by checking the stored pages against the extracted summary.
+- Cost at list price: Rs 1.014975 in total, Rs 0.0350 per document (29 successful extraction results, based on recorded token usage and configured model prices).
+
+### One thing that went wrong today, and how I fixed it
+
+The primary Gemini model hit its quota while extracting metadata. The gateway's fallback model completed the records, so the run finished with 29 valid results and no failed documents. I also checked a long RoDTEP schedule and found a valid but incomplete summary; that extraction still needs a better document-wide summary strategy.
+
+## D10 - Filtering extracted document metadata
+
+Tested the local API at `http://localhost:8000` after starting `uv run poe dev`:
+
+| Filter | Total | What the results showed |
+|---|---:|---|
+| `doc_kind=guideline&limit=3` | 2 | Both matching items include extracted `doc_kind`, `year`, `topics`, and `summary`, along with `language`. |
+| `language=en&limit=3` | 10 | The first three English items include their extracted fields; the list includes notices and a guideline. |
+| `number=4.01&limit=3` | 2 | I took `4.01` from the HBP chapter's extracted `number` list. Both returned guidelines contain it, showing that a value inside a list matches. |
+
+The existing `/v1/documents` endpoint filtered the new metadata without a new endpoint. The returned totals agree with the matching items in these queries.
+
+## D11 - Schema enforcement and routing
+
+### Provider-enforced schema
+
+- Saved `extract_v2`; its year rule says to return a year only when that exact year appears in the document text.
+- Started `uv run python scripts/extract_metadata.py --limit 20 --schema`. Eight documents were saved before Groq (`openai/gpt-oss-20b`) returned HTTP 400: `Failed to validate JSON. Please adjust your prompt.` I stopped schema mode as instructed.
+- Resumed the remaining 12 with default mode. Across the 20-document `extract_v2` batch: 20 ok, 0 repaired, 0 failed. The first 20 records in the earlier `extract_v1` run (29 total) also had 0 repaired and 0 failed. The schema-mode batch hit a provider limitation without improving these counts; only its first eight documents used `response_format`.
+- Gemini returned quota HTTP 429s during the run; Groq supplied all 20 successful results. No saved document has a failed extraction record.
+
+### Router behavior
+
+- `compare_prompts.py` now prints a confusion table for each router version. `classify_v2` was correct for all 9 docs, 6 personal, and 5 off-topic questions; v3 and v4 each returned `invalid` for docs test line 8.
+- Asked “When will my pending RoDTEP credit be released?” through local `/v1/chat`. The router classified it as `personal` and returned: “I can't know that from public export-policy documents, and I can't see your individual case or live status.” The two `FakeLLM` tests verify personal and off-topic questions return a fixed sentence after one call, with no answer-generation call.
+- Focused API and extraction tests: 29 passed. `uv run poe lint`: passed.

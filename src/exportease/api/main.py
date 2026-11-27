@@ -38,6 +38,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.engine = engine
     app.state.sessionmaker = make_sessionmaker(engine)
     app.state.system_prompt = chat.load_prompt(settings.prompts_dir)  # missing file: no start
+    app.state.classifier_prompt = chat.load_prompt(
+        settings.prompts_dir, chat.CLASSIFIER_PROMPT_VERSION
+    )
     app.state.gateway = build_gateway(settings, make_recorder(app.state.sessionmaker))
 
     app.middleware("http")(request_context)

@@ -11,11 +11,18 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field, field_validator
 
 from exportease.api.deps import GatewayDep, UsageDep
+from exportease.llm.classify import classify
 from exportease.llm.gateway import LLMResult, LLMUnavailable
 
 router = APIRouter(tags=["chat"])
 
 PROMPT_VERSION = "chat_system_v1"  # the file prompts/chat_system_v1.md
+CLASSIFIER_PROMPT_VERSION = "classify_v2"  # best measured router: 20/20 on the current set
+PERSONAL_REPLY = (
+    "I can't know that from public export-policy documents, "
+    "and I can't see your individual case or live status."
+)
+OFF_TOPIC_REPLY = "I can help with export-policy questions, but not that topic."
 
 
 def load_prompt(directory: Path, name: str = PROMPT_VERSION) -> str:
@@ -48,6 +55,35 @@ def summary(result: LLMResult) -> dict:
 
 @router.post("/chat")
 async def chat(body: ChatRequest, request: Request, gateway: GatewayDep):
+    try:
+        label, route_result = await classify(
+            gateway,
+            request.app.state.classifier_prompt,
+            CLASSIFIER_PROMPT_VERSION,
+            body.message,
+        )
+    except LLMUnavailable as exc:
+        raise HTTPException(
+            status_code=503, detail=f"No model could classify this question: {exc}"
+        ) from exc
+
+    if label == "invalid":
+        raise HTTPException(
+            status_code=502, detail="The question router returned an invalid label."
+        )
+    if label in ("personal", "off_topic"):
+        answer = PERSONAL_REPLY if label == "personal" else OFF_TOPIC_REPLY
+        result_summary = {"label": label, **summary(route_result)}
+        if not body.stream:
+            return {"answer": answer, **result_summary}
+
+        async def fixed_events() -> AsyncIterator[str]:
+            yield sse({"delta": answer})
+            yield sse(result_summary, event="done")
+
+        headers = {"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
+        return StreamingResponse(fixed_events(), media_type="text/event-stream", headers=headers)
+
     messages = [
         {"role": "system", "content": request.app.state.system_prompt},
         {"role": "user", "content": body.message},

@@ -81,16 +81,6 @@ def estimate_tokens(text: str) -> int:
     return max(1, len(text) // 4)
 
 
-def _token_count(value: object) -> int:
-    """Normalize provider usage values before they reach estimates and cost math."""
-    if isinstance(value, bool):
-        return 0
-    try:
-        return max(0, int(value))
-    except (TypeError, ValueError, OverflowError):
-        return 0
-
-
 class OpenAICompatProvider:
     """Any provider that speaks the OpenAI chat-completions API: Gemini, Groq, Ollama ..."""
 
@@ -115,10 +105,18 @@ class OpenAICompatProvider:
         if self._owns_client:
             await self._client.aclose()
 
-    def _body(self, messages: list[Message], temperature: float, stream: bool) -> dict:
+    def _body(
+        self,
+        messages: list[Message],
+        temperature: float,
+        stream: bool,
+        response_format: dict | None = None,
+    ) -> dict:
         body = {"model": self.model, "messages": messages, "temperature": temperature}
         if stream:
             body |= {"stream": True, "stream_options": {"include_usage": True}}
+        if response_format:  # ask the provider itself to produce JSON (Day 9)
+            body["response_format"] = response_format
         return body
 
     @staticmethod
@@ -138,33 +136,30 @@ class OpenAICompatProvider:
         timed_out = isinstance(exc, httpx.TimeoutException)
         return LLMError(type(exc).__name__, retryable=not timed_out)
 
-    async def generate(self, messages: list[Message], *, temperature: float = 0.2) -> Reply:
-        body = self._body(messages, temperature, stream=False)
+    async def generate(
+        self,
+        messages: list[Message],
+        *,
+        temperature: float = 0.2,
+        response_format: dict | None = None,
+    ) -> Reply:
+        body = self._body(messages, temperature, False, response_format)
         try:
             response = await self._client.post(self._url, headers=self._headers, json=body)
         except httpx.TransportError as exc:
             raise self._network_error(exc) from exc
         if response.status_code != 200:
             raise self._error(response)
-        try:
-            data = response.json()
-            usage = data.get("usage") or {}
-            text = data["choices"][0]["message"].get("content") or ""
-            if not isinstance(text, str):
-                raise TypeError("assistant content is not text")
-        except (ValueError, TypeError, KeyError, IndexError, AttributeError) as exc:
-            raise LLMError("provider returned an invalid chat response", retryable=True) from exc
-        return Reply(
-            text,
-            _token_count(usage.get("prompt_tokens")),
-            _token_count(usage.get("completion_tokens")),
-        )
+        data = response.json()
+        usage = data.get("usage") or {}
+        text = data["choices"][0]["message"].get("content") or ""
+        return Reply(text, usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0))
 
     async def stream(
         self, messages: list[Message], usage: Reply, *, temperature: float = 0.2
     ) -> AsyncIterator[str]:
         """Yield the answer piece by piece (server-sent events). Fills `usage` at the end."""
-        body = self._body(messages, temperature, stream=True)
+        body = self._body(messages, temperature, True)
         try:
             async with self._client.stream(
                 "POST", self._url, headers=self._headers, json=body
@@ -180,40 +175,14 @@ class OpenAICompatProvider:
                     if payload == "[DONE]":
                         finished = True
                         break
-                    try:
-                        chunk = json.loads(payload)
-                        if not isinstance(chunk, dict):
-                            raise TypeError("stream chunk is not an object")
-                    except (ValueError, TypeError) as exc:
-                        raise LLMError(
-                            "provider returned invalid stream data", retryable=True
-                        ) from exc
-                    counts = chunk.get("usage")
-                    if counts is not None:
-                        if not isinstance(counts, dict):
-                            raise LLMError("provider returned invalid stream usage", retryable=True)
-                        usage.tokens_in = _token_count(counts.get("prompt_tokens"))
-                        usage.tokens_out = _token_count(counts.get("completion_tokens"))
-                    choices = chunk.get("choices") or []
-                    if not isinstance(choices, list):
-                        raise LLMError("provider returned invalid stream choices", retryable=True)
-                    for choice in choices:
-                        if not isinstance(choice, dict):
-                            raise LLMError(
-                                "provider returned an invalid stream choice", retryable=True
-                            )
+                    chunk = json.loads(payload)
+                    if chunk.get("usage"):
+                        usage.tokens_in = chunk["usage"].get("prompt_tokens", 0)
+                        usage.tokens_out = chunk["usage"].get("completion_tokens", 0)
+                    for choice in chunk.get("choices") or []:
                         finished = finished or bool(choice.get("finish_reason"))
-                        delta = choice.get("delta") or {}
-                        if not isinstance(delta, dict):
-                            raise LLMError(
-                                "provider returned invalid stream content", retryable=True
-                            )
-                        piece = delta.get("content")
+                        piece = (choice.get("delta") or {}).get("content")
                         if piece:
-                            if not isinstance(piece, str):
-                                raise LLMError(
-                                    "provider returned non-text stream content", retryable=True
-                                )
                             yield piece
                 if not finished:  # the connection closed before the provider said "done"
                     raise LLMError("the stream ended early", retryable=True)
@@ -225,19 +194,22 @@ class FakeLLM:
     """A scripted provider for tests: no network, no bill.
 
     `script` holds what each call does, in order: a string is the answer, an exception is
-    raised, and ("partial", error) streams half an answer and then fails.
+    raised, and ("partial", error) streams half an answer and then fails. `seen` remembers
+    what the model was asked, so a test can check the messages and options.
     """
 
     def __init__(self, name: str = "fake", model: str = "fake-1", script: list | None = None):
         self.name, self.model = name, model
         self.script = list(script or [])
         self.calls = 0
+        self.seen: list[dict] = []
 
     def _next(self) -> object:
         self.calls += 1
         return self.script.pop(0) if self.script else "A fake answer."
 
-    async def generate(self, messages: list[Message], *, temperature: float = 0.2) -> Reply:
+    async def generate(self, messages: list[Message], **options) -> Reply:
+        self.seen.append({"messages": messages, **options})
         item = self._next()
         if isinstance(item, Exception):
             raise item
@@ -269,7 +241,6 @@ class CircuitBreaker:
         self.threshold, self.cooldown, self._clock = threshold, cooldown, clock
         self.failures = 0
         self._opened_at: float | None = None
-        self._probe_in_progress = False
 
     @property
     def state(self) -> str:
@@ -278,24 +249,15 @@ class CircuitBreaker:
         return "half-open" if self._clock() - self._opened_at >= self.cooldown else "open"
 
     def allow(self) -> bool:
-        state = self.state
-        if state == "open":
-            return False
-        if state == "half-open":
-            if self._probe_in_progress:
-                return False
-            self._probe_in_progress = True
-        return True
+        return self.state != "open"
 
     def success(self) -> None:
         self.failures, self._opened_at = 0, None
-        self._probe_in_progress = False
 
     def failure(self) -> None:
         self.failures += 1
         if self.failures >= self.threshold:
             self._opened_at = self._clock()
-        self._probe_in_progress = False
 
 
 class LLMGateway:
@@ -319,7 +281,7 @@ class LLMGateway:
         self._max_attempts, self._sleep, self._clock = max_attempts, sleep, clock
 
     async def aclose(self) -> None:
-        """Close provider-owned HTTP clients when the app shuts down."""
+        """Close provider-owned HTTP clients; simple fakes need no cleanup."""
         for provider in self.providers:
             close = getattr(provider, "aclose", None)
             if close is not None:
@@ -373,7 +335,7 @@ class LLMGateway:
         self, messages: list[Message], *, purpose: str = "chat", prompt_version: str = "", **options
     ) -> LLMResult:
         """Ask the first healthy provider; retry what can heal; fall back to the next one."""
-        started, problems, total_attempts = self._clock(), [], 0
+        started, problems = self._clock(), []
         for index, provider in enumerate(self.providers):
             breaker = self.breakers[provider.name]
             if not breaker.allow():
@@ -381,80 +343,56 @@ class LLMGateway:
                 continue
             error: LLMError | None = None
             for attempt in range(1, self._max_attempts + 1):
-                attempt_started = self._clock()
-                total_attempts += 1
                 try:
                     reply = await provider.generate(messages, **options)
                 except LLMError as exc:
                     error = exc
-                    await self._record(
-                        provider,
-                        purpose,
-                        prompt_version,
-                        status="error",
-                        error=str(exc)[:300],
-                        latency_ms=int((self._clock() - attempt_started) * 1000),
-                        fallback_used=index > 0,
-                    )
                     if not exc.retryable or attempt == self._max_attempts:
                         break
                     wait = max(random.uniform(0, 2**attempt), exc.retry_after or 0.0)
                     await self._sleep(min(wait, MAX_WAIT))
                     continue
                 breaker.success()
-                result = self._result(provider, messages, reply, started, total_attempts, index)
+                result = self._result(provider, messages, reply, started, attempt, index)
                 await self._record(provider, purpose, prompt_version, **self._fields(result))
                 return result
             breaker.failure()
             problems.append(f"{provider.name}: {error}")
+            await self._record(
+                provider, purpose, prompt_version, status="error", error=str(error)[:300]
+            )
         raise LLMUnavailable("; ".join(problems) or "no LLM provider is configured")
 
     async def stream(
         self, messages: list[Message], *, purpose: str = "chat", prompt_version: str = "", **options
     ) -> AsyncIterator[str | LLMResult]:
         """Yield pieces of text, then one LLMResult. Falls back only before the first piece."""
-        started, problems, total_attempts = self._clock(), [], 0
+        started, problems = self._clock(), []
         for index, provider in enumerate(self.providers):
             breaker = self.breakers[provider.name]
             if not breaker.allow():
                 problems.append(f"{provider.name}: circuit open")
                 continue
-            error: LLMError | None = None
-            for attempt in range(1, self._max_attempts + 1):
-                attempt_started = self._clock()
-                total_attempts += 1
-                usage, pieces = Reply(), []
-                try:
-                    async for piece in provider.stream(messages, usage, **options):
-                        pieces.append(piece)
-                        yield piece
-                except LLMError as exc:
-                    error = exc
-                    await self._record(
-                        provider,
-                        purpose,
-                        prompt_version,
-                        status="error",
-                        error=str(exc)[:300],
-                        latency_ms=int((self._clock() - attempt_started) * 1000),
-                        fallback_used=index > 0,
-                    )
-                    if pieces:  # never switch after the user has seen part of an answer
-                        breaker.failure()
-                        raise LLMUnavailable(f"{provider.name} failed mid-answer: {exc}") from exc
-                    if exc.retryable and attempt < self._max_attempts:
-                        wait = max(random.uniform(0, 2**attempt), exc.retry_after or 0.0)
-                        await self._sleep(min(wait, MAX_WAIT))
-                        continue
-                    break
-                breaker.success()
-                usage.text = "".join(pieces)
-                result = self._result(provider, messages, usage, started, total_attempts, index)
-                await self._record(provider, purpose, prompt_version, **self._fields(result))
-                yield result
-                return
-            breaker.failure()
-            problems.append(f"{provider.name}: {error}")
+            usage, pieces = Reply(), []
+            try:
+                async for piece in provider.stream(messages, usage, **options):
+                    pieces.append(piece)
+                    yield piece
+            except LLMError as exc:
+                breaker.failure()
+                await self._record(
+                    provider, purpose, prompt_version, status="error", error=str(exc)[:300]
+                )
+                if pieces:  # the user already saw half an answer: do not switch model silently
+                    raise LLMUnavailable(f"{provider.name} failed mid-answer: {exc}") from exc
+                problems.append(f"{provider.name}: {exc}")
+                continue
+            breaker.success()
+            usage.text = "".join(pieces)
+            result = self._result(provider, messages, usage, started, 1, index)
+            await self._record(provider, purpose, prompt_version, **self._fields(result))
+            yield result
+            return
         raise LLMUnavailable("; ".join(problems) or "no LLM provider is configured")
 
 

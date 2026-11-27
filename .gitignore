@@ -19,3 +19,4 @@ data/parsed/
 # Test and coverage output
 .coverage
 htmlcov/
+eval/cache/

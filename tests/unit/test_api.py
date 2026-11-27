@@ -97,6 +97,35 @@ def test_bad_limit_is_422_problem(client):
     assert r.json()["errors"][0]["field"] == "query.limit"
 
 
+def test_personal_chat_returns_fixed_reply_without_answer_model_call(client, llm):
+    llm.script = ["personal"]
+    response = client.post(
+        "/v1/chat",
+        json={"message": "When will my pending RoDTEP credit be released?", "stream": False},
+    )
+    assert response.status_code == 200
+    assert response.json()["label"] == "personal"
+    assert response.json()["answer"] == (
+        "I can't know that from public export-policy documents, "
+        "and I can't see your individual case or live status."
+    )
+    assert llm.calls == 1
+    assert llm.seen[0]["messages"][0]["content"] == client.app.state.classifier_prompt
+
+
+def test_off_topic_chat_returns_fixed_reply_without_answer_model_call(client, llm):
+    llm.script = ["off_topic"]
+    response = client.post(
+        "/v1/chat", json={"message": "Suggest a name for my pet dog.", "stream": False}
+    )
+    assert response.status_code == 200
+    assert response.json()["label"] == "off_topic"
+    assert (
+        response.json()["answer"] == "I can help with export-policy questions, but not that topic."
+    )
+    assert llm.calls == 1
+
+
 def test_request_id_is_echoed(client):
     r = client.get("/health", headers={"X-Request-ID": "abc123"})
     assert r.headers["X-Request-ID"] == "abc123"
