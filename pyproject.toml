@@ -66,6 +66,7 @@ skip_covered = true
 
 [tool.poe.tasks]
 dev = "uvicorn exportease.api.main:create_app --factory --reload --no-access-log"
+worker = "arq exportease.workers.main.WorkerSettings"
 lint = ["_ruff_check", "_ruff_format"]
 _ruff_check = "ruff check ."
 _ruff_format = "ruff format --check ."
@@ -73,6 +74,7 @@ test = "pytest tests/unit"
 cov = "pytest --cov --cov-report=term-missing"
 migrate = "alembic upgrade head"
 seed = "python scripts/load_db.py"
+
 
 [tool.poe.tasks.test-integration]
 help = "Integration tests against the Postgres from docker compose (run `make up` first)"
